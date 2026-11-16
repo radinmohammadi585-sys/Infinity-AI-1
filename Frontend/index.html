@@ -6,120 +6,268 @@
 <title>Infinity AI 1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#070b16;--fg:#eef2ff;--muted:#94a3b8;--card:#121a2f;--line:#1e293b;--accent:#3b82f6;--accent2:#8b5cf6}
+:root{--bg:#070b16;--fg:#eef2ff;--muted:#94a3b8;--card:rgba(18,26,47,.9);--line:rgba(148,163,184,.2);--accent:#3b82f6;--accent2:#8b5cf6;--ok:#22c55e;--bad:#ef4444;--warn:#eab308}
 *{box-sizing:border-box}
-body{margin:0;font-family:"Vazirmatn","Inter",system-ui,sans-serif;background:radial-gradient(1200px 600px at 20% -10%,#1e3a8a55,transparent),radial-gradient(900px 500px at 90% 0%,#6d28d955,transparent),var(--bg);color:var(--fg);min-height:100vh;display:flex;font-size:15px;line-height:1.7}
-.sidebar{width:280px;background:rgba(15,23,42,.9);border-inline-end:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:8px}
-.brand{font-weight:800;font-size:20px;margin-bottom:10px}
-.side-btn{text-align:start;background:transparent;border:1px solid transparent;color:var(--fg);padding:11px 12px;border-radius:12px;cursor:pointer;font-family:inherit;font-size:14px}
+body{margin:0;min-height:100vh;display:flex;color:var(--fg);font-family:"Vazirmatn",system-ui,sans-serif;font-size:15px;line-height:1.7;
+background:radial-gradient(1200px 600px at 20% -10%,#1e3a8a55,transparent),radial-gradient(900px 500px at 90% 0%,#6d28d955,transparent),var(--bg)}
+.sidebar{width:260px;background:rgba(15,23,42,.9);border-inline-end:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.brand{font-weight:800;font-size:18px;padding:6px 10px 12px}
+.nav-label{font-size:11px;color:var(--muted);padding:10px 12px 4px}
+.side-btn{text-align:start;background:transparent;border:1px solid transparent;color:var(--fg);padding:11px 12px;border-radius:12px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;width:100%}
 .side-btn:hover,.side-btn.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.35)}
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
-.top{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);gap:10px;flex-wrap:wrap}
+.top{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);gap:10px;flex-wrap:wrap;background:rgba(7,11,22,.55)}
+.status-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(15,23,42,.85)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.dot.off{background:var(--bad)}
+.dot.warn{background:var(--warn)}
 .lang{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:13px}
-.stage{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 20px 20px}
-.prompt-title{font-size:clamp(22px,3.2vw,36px);font-weight:700;text-align:center;margin:48px 0 28px;max-width:760px;line-height:1.45}
-.chat-log{width:min(820px,100%);flex:1;overflow:auto;padding:8px 0;min-height:120px}
-.msg{max-width:85%;margin:8px 0;padding:12px 16px;border-radius:18px;line-height:1.65;white-space:pre-wrap;font-size:15px}
+.page{display:none;padding:20px;flex:1;overflow:auto;animation:fade .3s ease}
+.page.on{display:flex;flex-direction:column;align-items:center}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.prompt-title{font-size:clamp(22px,3.2vw,34px);font-weight:700;text-align:center;margin:24px 0 16px;max-width:760px;line-height:1.45}
+.chat-log{width:min(820px,100%);flex:1;overflow:auto;min-height:140px}
+.msg{max-width:85%;margin:8px 0;padding:12px 16px;border-radius:18px;line-height:1.65;white-space:pre-wrap}
 .user{margin-inline-start:auto;background:rgba(59,130,246,.25)}
 .bot{margin-inline-end:auto;background:rgba(15,23,42,.92);border:1px solid var(--line)}
 .composer{width:min(820px,100%);display:flex;gap:10px;margin-top:14px}
 .composer input{flex:1;border-radius:999px;border:1px solid var(--line);background:rgba(15,23,42,.95);color:var(--fg);padding:16px 20px;font-size:15px;outline:none;font-family:inherit}
-.composer button{border:0;border-radius:999px;padding:0 22px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px}
-.thinking{display:none;align-items:center;justify-content:center;margin:10px auto;width:110px;height:44px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06)}
+.composer button{border:0;border-radius:999px;padding:0 22px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;cursor:pointer;font-family:inherit}
+.thinking{display:none;align-items:center;justify-content:center;margin:10px auto;width:110px;height:44px;border-radius:999px;border:1px solid rgba(255,255,255,.12)}
 .thinking.on{display:flex}
 .thinking .d{width:9px;height:9px;margin:0 5px;border-radius:50%;animation:td 1.15s infinite ease-in-out}
 .thinking .d:nth-child(1){animation-delay:0s}.thinking .d:nth-child(2){animation-delay:.18s}.thinking .d:nth-child(3){animation-delay:.36s}
-@keyframes td{0%{background:#3b82f6;opacity:.5}33%{background:#22c55e;transform:translateY(-4px);opacity:1}66%{background:#ef4444;opacity:.9}100%{background:#3b82f6;opacity:.5}}
-@media(max-width:800px){.sidebar{display:none}.sidebar.open{display:flex;position:fixed;inset:0 auto 0 0;z-index:20;width:80vw}}
+@keyframes td{0%{background:#3b82f6;opacity:.5}33%{background:#22c55e;transform:translateY(-4px);opacity:1}66%{background:#ef4444}100%{background:#3b82f6;opacity:.5}}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;width:min(820px,100%);margin-top:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.card.click{cursor:pointer}.card.click:hover{border-color:rgba(59,130,246,.45)}
+.peer-list{display:flex;flex-direction:column;gap:8px;width:min(820px,100%);margin-top:12px}
+.peer-row{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--card);width:100%}
+.muted{color:var(--muted)}
+.bottom{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(15,23,42,.95);border-top:1px solid var(--line);justify-content:space-around;padding:8px;z-index:5}
+.bottom button{background:transparent;border:0;color:var(--fg);font-size:18px;padding:8px;cursor:pointer}
+@media(max-width:800px){.sidebar{display:none}.sidebar.open{display:flex;position:fixed;inset:0 auto 0 0;z-index:20;width:78vw}.bottom{display:flex}.page{padding-bottom:80px}}
 </style>
 </head>
 <body>
 <aside class="sidebar" id="side">
   <div class="brand">Infinity AI 1</div>
-  <button type="button" class="side-btn on" id="btnNew">گفتگوی جدید</button>
-  <div id="hist" style="flex:1;overflow:auto;font-size:13px;color:var(--muted)"></div>
-  <button type="button" class="side-btn" id="btnProfile">حساب کاربری</button>
+  <div class="nav-label">بخش‌ها</div>
+  <button type="button" class="side-btn on" data-p="chat">💬 گفتگو</button>
+  <button type="button" class="side-btn" data-p="history">🕘 تاریخچه</button>
+  <button type="button" class="side-btn" data-p="status">📡 وضعیت سرور و پل</button>
+  <button type="button" class="side-btn" data-p="account">👤 حساب کاربری</button>
+  <div style="flex:1"></div>
+  <button type="button" class="side-btn" id="btnNew">گفتگوی جدید</button>
 </aside>
 <div class="main">
   <div class="top">
-    <button type="button" class="side-btn" id="menuBtn" style="display:none">☰</button>
-    <span style="color:var(--muted);font-size:13px" id="peerLine">پل: …</span>
-    <select class="lang" id="langSel" aria-label="زبان"></select>
+    <button type="button" class="side-btn" id="menuBtn" style="display:none;width:auto">☰</button>
+    <span id="title" style="font-weight:800">گفتگو</span>
+    <div class="status-bar">
+      <span class="pill"><span class="dot" id="dotServer"></span><span id="txtServer">سرور: …</span></span>
+      <span class="pill"><span class="dot" id="dotBridge"></span><span id="txtBridge">پل: …</span></span>
+      <select class="lang" id="langSel" aria-label="زبان"></select>
+    </div>
   </div>
-  <div class="stage">
+
+  <section class="page on" id="page-chat">
     <h1 class="prompt-title" id="heroText">امروز چه کاری می‌توانیم انجام دهیم؟</h1>
     <div class="thinking" id="thinking"><span class="d"></span><span class="d"></span><span class="d"></span></div>
     <div class="chat-log" id="log"></div>
     <div class="composer">
-      <input id="inp" placeholder="پیام خود را بنویسید…"/>
+      <input id="inp" placeholder="پیام خود را بنویسید…" autocomplete="off"/>
       <button type="button" id="send">ارسال</button>
     </div>
-    <label style="margin-top:10px;font-size:12px;color:var(--muted)"><input type="checkbox" id="useBridge"/> پرسیدن از بقیه پروژه‌های Infinity</label>
-  </div>
+    <label class="muted" style="margin-top:10px;font-size:12px"><input type="checkbox" id="useBridge"/> پرسیدن از بقیه پروژه‌های Infinity</label>
+  </section>
+
+  <section class="page" id="page-history">
+    <h2 style="align-self:stretch;width:min(820px,100%)">تاریخچه گفتگو</h2>
+    <p class="muted" style="width:min(820px,100%)">گفتگوهای این نشست در همین مرورگر نگه داشته می‌شوند.</p>
+    <div class="cards" id="histCards"></div>
+  </section>
+
+  <section class="page" id="page-status">
+    <h2 style="align-self:stretch;width:min(820px,100%)">وضعیت سرور و پل</h2>
+    <div class="card" style="width:min(820px,100%);margin-top:8px">
+      <div><b>سرور:</b> <span id="stServer">…</span></div>
+      <div class="muted" id="stServerDetail" style="margin-top:6px"></div>
+    </div>
+    <div class="peer-list" id="peerList"></div>
+    <button type="button" id="refreshStatus" class="side-btn" style="width:auto;margin-top:12px;background:rgba(59,130,246,.2)">تازه‌سازی</button>
+  </section>
+
+  <section class="page" id="page-account">
+    <h2 style="width:min(420px,100%)">حساب کاربری</h2>
+    <div class="card" style="width:min(420px,100%);margin-top:8px">
+      <label class="muted">نام کاربری<input id="accUser" style="width:100%;margin-top:4px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0f172a;color:var(--fg);font-family:inherit"/></label>
+      <label class="muted" style="display:block;margin-top:10px">رمز<input id="accPass" type="password" style="width:100%;margin-top:4px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0f172a;color:var(--fg);font-family:inherit"/></label>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button type="button" id="btnReg" class="side-btn" style="background:rgba(59,130,246,.25)">ثبت‌نام</button>
+        <button type="button" id="btnLogin" class="side-btn" style="background:rgba(139,92,246,.25)">ورود</button>
+      </div>
+      <div id="accMsg" class="muted" style="margin-top:10px"></div>
+    </div>
+  </section>
+</div>
+<div class="bottom">
+  <button type="button" data-p="chat">💬</button>
+  <button type="button" data-p="history">🕘</button>
+  <button type="button" data-p="status">📡</button>
+  <button type="button" data-p="account">👤</button>
 </div>
 <script>
-const API=localStorage.getItem('BACKEND_URL')||'http://127.0.0.1:8101';
-const RTL=new Set(['fa','ar','ur','he','ps','yi']);
-const T={
- fa:'امروز چه کاری می‌توانیم انجام دهیم؟',
- en:'What can we do today?',
- ar:'ماذا يمكننا أن نفعل اليوم؟',
- tr:'Bugün ne yapabiliriz?',
- de:'Was können wir heute tun?',
- fr:"Que pouvons-nous faire aujourd'hui ?",
- es:'¿Qué podemos hacer hoy?',
- ru:'Что мы можем сделать сегодня?',
- zh:'今天我们能做什么？',
- ja:'今日は何ができますか？',
- hi:'आज हम क्या कर सकते हैं?',
- ur:'آج ہم کیا کر سکتے ہیں؟'
+/** Same origin on Render — do NOT use 127.0.0.1 */
+const API = (localStorage.getItem('BACKEND_URL') || '').replace(/\/$/, '');
+const RTL = new Set(['fa','ar','ur','he','ps','yi']);
+const T = {
+  fa:'امروز چه کاری می‌توانیم انجام دهیم؟',
+  en:'What can we do today?',
+  ar:'ماذا يمكننا أن نفعل اليوم؟',
+  tr:'Bugün ne yapabiliriz?',
+  de:'Was können wir heute tun?',
+  fr:"Que pouvons-nous faire aujourd'hui ?",
+  es:'¿Qué podemos hacer hoy?',
+  ru:'Что мы можем сделать сегодня?',
+  zh:'今天我们能做什么？',
+  ja:'今日は何ができますか？'
 };
-const LANG_LABEL={fa:'فارسی',en:'English',ar:'العربية',tr:'Türkçe',de:'Deutsch',fr:'Français',es:'Español',ru:'Русский',zh:'中文',ja:'日本語',hi:'हिन्दी',ur:'اردو'};
-const langSel=document.getElementById('langSel');
-const htmlRoot=document.getElementById('htmlRoot');
-const DEFAULT_LANGS=['fa','en','ar','tr','de','fr','es','ru','zh','ja','hi','ur'];
-function fillLangs(codes){
-  langSel.innerHTML='';
-  const list=[...new Set(['fa',...codes])];
-  list.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=(LANG_LABEL[c]?LANG_LABEL[c]+' — ':'')+c;langSel.appendChild(o);});
+const titles = {chat:'گفتگو',history:'تاریخچه',status:'وضعیت سرور و پل',account:'حساب کاربری'};
+const langSel = document.getElementById('langSel');
+const htmlRoot = document.getElementById('htmlRoot');
+const log = document.getElementById('log');
+const thinking = document.getElementById('thinking');
+const inp = document.getElementById('inp');
+let history = JSON.parse(localStorage.getItem('inf1_hist') || '[]');
+
+function go(p){
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('on'));
+  const el = document.getElementById('page-'+p);
+  if (el) el.classList.add('on');
+  document.getElementById('title').textContent = titles[p] || p;
+  document.querySelectorAll('[data-p]').forEach(b => b.classList.toggle('on', b.dataset.p === p));
+  if (p === 'history') renderHist();
+  if (p === 'status') refreshStatus();
 }
-async function loadLangs(){
-  try{const r=await fetch(API+'/api/languages');const j=await r.json();fillLangs(j.codes&&j.codes.length?j.codes:DEFAULT_LANGS);}
-  catch(e){fillLangs(DEFAULT_LANGS);}
-  const saved=localStorage.getItem('inf_lang')||'fa';
-  if([...langSel.options].some(o=>o.value===saved)) langSel.value=saved; else langSel.value='fa';
-  applyLang(langSel.value);
-}
+document.querySelectorAll('[data-p]').forEach(b => b.addEventListener('click', () => go(b.dataset.p)));
+
 function applyLang(code){
-  localStorage.setItem('inf_lang',code);
-  const rtl=RTL.has(code);htmlRoot.lang=code;htmlRoot.dir=rtl?'rtl':'ltr';
-  document.getElementById('heroText').textContent=T[code]||T.en;
-  document.getElementById('inp').placeholder=rtl?'پیام خود را بنویسید…':'Type your message…';
-  document.getElementById('send').textContent=rtl?'ارسال':'Send';
-  document.getElementById('btnNew').textContent=rtl?'گفتگوی جدید':'New chat';
-  document.getElementById('btnProfile').textContent=rtl?'حساب کاربری':'Account';
+  localStorage.setItem('inf_lang', code);
+  const rtl = RTL.has(code);
+  htmlRoot.lang = code; htmlRoot.dir = rtl ? 'rtl' : 'ltr';
+  document.getElementById('heroText').textContent = T[code] || T.en;
+  inp.placeholder = rtl ? 'پیام خود را بنویسید…' : 'Type your message…';
+  document.getElementById('send').textContent = rtl ? 'ارسال' : 'Send';
 }
-langSel.onchange=()=>applyLang(langSel.value);
-const log=document.getElementById('log'),thinking=document.getElementById('thinking'),inp=document.getElementById('inp');
-function add(cls,t){const d=document.createElement('div');d.className='msg '+cls;d.textContent=t;log.appendChild(d);log.scrollTop=log.scrollHeight}
+const LAB = {fa:'فارسی',en:'English',ar:'العربية',tr:'Türkçe',de:'Deutsch',fr:'Français',es:'Español',ru:'Русский',zh:'中文',ja:'日本語'};
+['fa','en','ar','tr','de','fr','es','ru','zh','ja'].forEach(c => {
+  const o = document.createElement('option'); o.value=c; o.textContent=(LAB[c]||c)+' — '+c; langSel.appendChild(o);
+});
+langSel.value = localStorage.getItem('inf_lang') || 'fa';
+applyLang(langSel.value);
+langSel.onchange = () => applyLang(langSel.value);
+
+function add(cls, text){
+  const d = document.createElement('div'); d.className = 'msg '+cls; d.textContent = text;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+function saveTurn(user, bot){
+  history.unshift({t: Date.now(), user, bot});
+  history = history.slice(0, 30);
+  localStorage.setItem('inf1_hist', JSON.stringify(history));
+}
+function renderHist(){
+  const box = document.getElementById('histCards');
+  if (!history.length) { box.innerHTML = '<div class="muted">هنوز گفتگویی نیست</div>'; return; }
+  box.innerHTML = history.map(h => '<div class="card"><div class="muted" style="font-size:12px">'+new Date(h.t).toLocaleString()+'</div><b>'+escapeHtml(h.user)+'</b><div class="muted" style="margin-top:6px">'+escapeHtml((h.bot||'').slice(0,120))+'</div></div>').join('');
+}
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));}
+
 async function send(){
-  const t=(inp.value||'').trim();if(!t)return;inp.value='';
-  document.getElementById('heroText').style.opacity='.35';
-  add('user',t);thinking.classList.add('on');
-  try{
-    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,bridge:document.getElementById('useBridge').checked,lang:langSel.value})});
-    const j=await r.json();add('bot',(j&&j.reply)?j.reply:JSON.stringify(j));
-  }catch(e){add('bot','اتصال به سرور برقرار نشد: '+API)}
-  finally{thinking.classList.remove('on')}
+  const t = (inp.value||'').trim(); if(!t) return; inp.value='';
+  document.getElementById('heroText').style.opacity = '.35';
+  add('user', t); thinking.classList.add('on');
+  let bot = '';
+  try {
+    const r = await fetch(API + '/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message:t, bridge: document.getElementById('useBridge').checked, lang: langSel.value})
+    });
+    const j = await r.json();
+    bot = (j && j.reply) ? j.reply : JSON.stringify(j);
+    add('bot', bot);
+  } catch(e) {
+    bot = 'اتصال به سرور برقرار نشد. اگر روی Render هستید صفحه را یک‌بار سخت‌رفرش کنید.';
+    add('bot', bot);
+  } finally {
+    thinking.classList.remove('on');
+    saveTurn(t, bot);
+  }
 }
-document.getElementById('send').onclick=send;inp.addEventListener('keydown',e=>{if(e.key==='Enter')send()});
-document.getElementById('btnNew').onclick=()=>{log.innerHTML='';document.getElementById('heroText').style.opacity='1'};
-async function peers(){try{const j=await(await fetch(API+'/api/peers')).json();const live=(j.peers||[]).filter(p=>p.live).map(p=>p.name).join(' · ')||'—';document.getElementById('peerLine').textContent='پل: '+live}catch(e){document.getElementById('peerLine').textContent='پل: آفلاین'}}
-loadLangs();peers();setInterval(peers,8000);
-if(matchMedia('(max-width:800px)').matches)document.getElementById('menuBtn').style.display='inline-block';
+document.getElementById('send').onclick = send;
+inp.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+document.getElementById('btnNew').onclick = () => {
+  log.innerHTML=''; document.getElementById('heroText').style.opacity='1'; go('chat');
+};
+
+async function refreshStatus(){
+  const dotS=document.getElementById('dotServer'), txtS=document.getElementById('txtServer');
+  const dotB=document.getElementById('dotBridge'), txtB=document.getElementById('txtBridge');
+  try {
+    const r = await fetch(API + '/api/health', {cache:'no-store'});
+    const j = await r.json();
+    if (r.ok && j.ok) {
+      dotS.className='dot on'; txtS.textContent='سرور: آنلاین';
+      document.getElementById('stServer').textContent='آنلاین ✓';
+      document.getElementById('stServerDetail').textContent='اپ: '+(j.app||'Infinity AI 1')+' | API: '+(API||'(همین دامنه)');
+    } else throw new Error('bad');
+  } catch(e) {
+    dotS.className='dot off'; txtS.textContent='سرور: آفلاین';
+    document.getElementById('stServer').textContent='آفلاین';
+    document.getElementById('stServerDetail').textContent='GET /api/health ناموفق — API='+(API||'(relative)');
+  }
+  try {
+    const r = await fetch(API + '/api/peers', {cache:'no-store'});
+    const j = await r.json();
+    const peers = j.peers || [];
+    const live = peers.filter(p => p.live);
+    if (live.length) { dotB.className='dot on'; txtB.textContent='پل: '+live.length+' آنلاین'; }
+    else { dotB.className='dot warn'; txtB.textContent='پل: peer زنده‌ای نیست'; }
+    document.getElementById('peerList').innerHTML = peers.map(p =>
+      '<div class="peer-row"><span><b>'+(p.name||p.id)+'</b><div class="muted" style="font-size:12px">'+(p.url||'')+'</div></span>'
+      +'<span class="pill"><span class="dot '+(p.live?'on':'off')+'"></span>'+(p.live?'زنده':'خاموش')+'</span></div>'
+    ).join('') || '<div class="muted">لیست خالی</div>';
+  } catch(e) {
+    dotB.className='dot off'; txtB.textContent='پل: خطا';
+    document.getElementById('peerList').innerHTML = '<div class="muted">خواندن /api/peers ممکن نشد</div>';
+  }
+}
+document.getElementById('refreshStatus').onclick = refreshStatus;
+
+async function acc(path){
+  const u=document.getElementById('accUser').value.trim();
+  const p=document.getElementById('accPass').value;
+  const msg=document.getElementById('accMsg');
+  try{
+    const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const j=await r.json();
+    msg.textContent = j.ok ? ('موفق: '+(j.username||u)) : (j.error||'خطا');
+  }catch(e){msg.textContent='خطای اتصال';}
+}
+document.getElementById('btnReg').onclick=()=>acc('/api/auth/register');
+document.getElementById('btnLogin').onclick=()=>acc('/api/auth/login');
+
+if (matchMedia('(max-width:800px)').matches) document.getElementById('menuBtn').style.display='inline-block';
 document.getElementById('menuBtn').onclick=()=>document.getElementById('side').classList.toggle('open');
+
+refreshStatus();
+setInterval(refreshStatus, 8000);
 </script>
-</body></html>
+</body>
+</html>
