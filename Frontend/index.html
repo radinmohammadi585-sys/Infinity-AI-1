@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" id="htmlRoot">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Infinity AI 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+:root{--bg:#070b16;--fg:#eef2ff;--muted:#94a3b8;--card:#121a2f;--line:#1e293b;--accent:#3b82f6;--accent2:#8b5cf6}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Vazirmatn","Inter",system-ui,sans-serif;background:radial-gradient(1200px 600px at 20% -10%,#1e3a8a55,transparent),radial-gradient(900px 500px at 90% 0%,#6d28d955,transparent),var(--bg);color:var(--fg);min-height:100vh;display:flex;font-size:15px;line-height:1.7}
+.sidebar{width:280px;background:rgba(15,23,42,.9);border-inline-end:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:8px}
+.brand{font-weight:800;font-size:20px;margin-bottom:10px}
+.side-btn{text-align:start;background:transparent;border:1px solid transparent;color:var(--fg);padding:11px 12px;border-radius:12px;cursor:pointer;font-family:inherit;font-size:14px}
+.side-btn:hover,.side-btn.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.35)}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);gap:10px;flex-wrap:wrap}
+.lang{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:13px}
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 20px 20px}
+.prompt-title{font-size:clamp(22px,3.2vw,36px);font-weight:700;text-align:center;margin:48px 0 28px;max-width:760px;line-height:1.45}
+.chat-log{width:min(820px,100%);flex:1;overflow:auto;padding:8px 0;min-height:120px}
+.msg{max-width:85%;margin:8px 0;padding:12px 16px;border-radius:18px;line-height:1.65;white-space:pre-wrap;font-size:15px}
+.user{margin-inline-start:auto;background:rgba(59,130,246,.25)}
+.bot{margin-inline-end:auto;background:rgba(15,23,42,.92);border:1px solid var(--line)}
+.composer{width:min(820px,100%);display:flex;gap:10px;margin-top:14px}
+.composer input{flex:1;border-radius:999px;border:1px solid var(--line);background:rgba(15,23,42,.95);color:var(--fg);padding:16px 20px;font-size:15px;outline:none;font-family:inherit}
+.composer button{border:0;border-radius:999px;padding:0 22px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px}
+.thinking{display:none;align-items:center;justify-content:center;margin:10px auto;width:110px;height:44px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06)}
+.thinking.on{display:flex}
+.thinking .d{width:9px;height:9px;margin:0 5px;border-radius:50%;animation:td 1.15s infinite ease-in-out}
+.thinking .d:nth-child(1){animation-delay:0s}.thinking .d:nth-child(2){animation-delay:.18s}.thinking .d:nth-child(3){animation-delay:.36s}
+@keyframes td{0%{background:#3b82f6;opacity:.5}33%{background:#22c55e;transform:translateY(-4px);opacity:1}66%{background:#ef4444;opacity:.9}100%{background:#3b82f6;opacity:.5}}
+@media(max-width:800px){.sidebar{display:none}.sidebar.open{display:flex;position:fixed;inset:0 auto 0 0;z-index:20;width:80vw}}
+</style>
+</head>
+<body>
+<aside class="sidebar" id="side">
+  <div class="brand">Infinity AI 1</div>
+  <button type="button" class="side-btn on" id="btnNew">گفتگوی جدید</button>
+  <div id="hist" style="flex:1;overflow:auto;font-size:13px;color:var(--muted)"></div>
+  <button type="button" class="side-btn" id="btnProfile">حساب کاربری</button>
+</aside>
+<div class="main">
+  <div class="top">
+    <button type="button" class="side-btn" id="menuBtn" style="display:none">☰</button>
+    <span style="color:var(--muted);font-size:13px" id="peerLine">پل: …</span>
+    <select class="lang" id="langSel" aria-label="زبان"></select>
+  </div>
+  <div class="stage">
+    <h1 class="prompt-title" id="heroText">امروز چه کاری می‌توانیم انجام دهیم؟</h1>
+    <div class="thinking" id="thinking"><span class="d"></span><span class="d"></span><span class="d"></span></div>
+    <div class="chat-log" id="log"></div>
+    <div class="composer">
+      <input id="inp" placeholder="پیام خود را بنویسید…"/>
+      <button type="button" id="send">ارسال</button>
+    </div>
+    <label style="margin-top:10px;font-size:12px;color:var(--muted)"><input type="checkbox" id="useBridge"/> پرسیدن از بقیه پروژه‌های Infinity</label>
+  </div>
+</div>
+<script>
+const API=localStorage.getItem('BACKEND_URL')||'http://127.0.0.1:8101';
+const RTL=new Set(['fa','ar','ur','he','ps','yi']);
+const T={
+ fa:'امروز چه کاری می‌توانیم انجام دهیم؟',
+ en:'What can we do today?',
+ ar:'ماذا يمكننا أن نفعل اليوم؟',
+ tr:'Bugün ne yapabiliriz?',
+ de:'Was können wir heute tun?',
+ fr:"Que pouvons-nous faire aujourd'hui ?",
+ es:'¿Qué podemos hacer hoy?',
+ ru:'Что мы можем сделать сегодня?',
+ zh:'今天我们能做什么？',
+ ja:'今日は何ができますか？',
+ hi:'आज हम क्या कर सकते हैं?',
+ ur:'آج ہم کیا کر سکتے ہیں؟'
+};
+const LANG_LABEL={fa:'فارسی',en:'English',ar:'العربية',tr:'Türkçe',de:'Deutsch',fr:'Français',es:'Español',ru:'Русский',zh:'中文',ja:'日本語',hi:'हिन्दी',ur:'اردو'};
+const langSel=document.getElementById('langSel');
+const htmlRoot=document.getElementById('htmlRoot');
+const DEFAULT_LANGS=['fa','en','ar','tr','de','fr','es','ru','zh','ja','hi','ur'];
+function fillLangs(codes){
+  langSel.innerHTML='';
+  const list=[...new Set(['fa',...codes])];
+  list.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=(LANG_LABEL[c]?LANG_LABEL[c]+' — ':'')+c;langSel.appendChild(o);});
+}
+async function loadLangs(){
+  try{const r=await fetch(API+'/api/languages');const j=await r.json();fillLangs(j.codes&&j.codes.length?j.codes:DEFAULT_LANGS);}
+  catch(e){fillLangs(DEFAULT_LANGS);}
+  const saved=localStorage.getItem('inf_lang')||'fa';
+  if([...langSel.options].some(o=>o.value===saved)) langSel.value=saved; else langSel.value='fa';
+  applyLang(langSel.value);
+}
+function applyLang(code){
+  localStorage.setItem('inf_lang',code);
+  const rtl=RTL.has(code);htmlRoot.lang=code;htmlRoot.dir=rtl?'rtl':'ltr';
+  document.getElementById('heroText').textContent=T[code]||T.en;
+  document.getElementById('inp').placeholder=rtl?'پیام خود را بنویسید…':'Type your message…';
+  document.getElementById('send').textContent=rtl?'ارسال':'Send';
+  document.getElementById('btnNew').textContent=rtl?'گفتگوی جدید':'New chat';
+  document.getElementById('btnProfile').textContent=rtl?'حساب کاربری':'Account';
+}
+langSel.onchange=()=>applyLang(langSel.value);
+const log=document.getElementById('log'),thinking=document.getElementById('thinking'),inp=document.getElementById('inp');
+function add(cls,t){const d=document.createElement('div');d.className='msg '+cls;d.textContent=t;log.appendChild(d);log.scrollTop=log.scrollHeight}
+async function send(){
+  const t=(inp.value||'').trim();if(!t)return;inp.value='';
+  document.getElementById('heroText').style.opacity='.35';
+  add('user',t);thinking.classList.add('on');
+  try{
+    const r=await fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,bridge:document.getElementById('useBridge').checked,lang:langSel.value})});
+    const j=await r.json();add('bot',(j&&j.reply)?j.reply:JSON.stringify(j));
+  }catch(e){add('bot','اتصال به سرور برقرار نشد: '+API)}
+  finally{thinking.classList.remove('on')}
+}
+document.getElementById('send').onclick=send;inp.addEventListener('keydown',e=>{if(e.key==='Enter')send()});
+document.getElementById('btnNew').onclick=()=>{log.innerHTML='';document.getElementById('heroText').style.opacity='1'};
+async function peers(){try{const j=await(await fetch(API+'/api/peers')).json();const live=(j.peers||[]).filter(p=>p.live).map(p=>p.name).join(' · ')||'—';document.getElementById('peerLine').textContent='پل: '+live}catch(e){document.getElementById('peerLine').textContent='پل: آفلاین'}}
+loadLangs();peers();setInterval(peers,8000);
+if(matchMedia('(max-width:800px)').matches)document.getElementById('menuBtn').style.display='inline-block';
+document.getElementById('menuBtn').onclick=()=>document.getElementById('side').classList.toggle('open');
+</script>
+</body></html>
